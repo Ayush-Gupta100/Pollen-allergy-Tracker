@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - Allergy Tracker</title>
+  <style>
+    /* [Style remains 100% same as yours] */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #f1f8e9, #e0f2f1);
+      height: 100vh;
+    }
+
+    .container {
+      position: relative;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card {
+      background: #ffffff;
+      padding: 40px 30px;
+      border-radius: 16px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+      width: 380px;
+      text-align: center;
+      position: relative;
+    }
+
+    h1 {
+      margin-top: 0;
+      color: #2e7d32;
+      font-size: 28px;
+    }
+
+    label {
+      font-size: 18px;
+      color: #333;
+      display: block;
+      margin-bottom: 10px;
+      margin-top: 20px;
+    }
+
+    select {
+      padding: 10px;
+      font-size: 16px;
+      width: 100%;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 12px;
+      font-size: 16px;
+      background-color: #43a047;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #2e7d32;
+    }
+
+    .status {
+      margin-top: 25px;
+      font-size: 16px;
+      color: #444;
+      background-color: #e8f5e9;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .alert {
+      background-color: #ffebee;
+      color: #c62828;
+    }
+
+    .safe {
+      background-color: #e3f2fd;
+      color: #1565c0;
+    }
+
+    .name-btn-top-right {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+
+      padding: 4px 8px;
+      font-size: 12px;
+      font-weight: 500;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      max-width: 200px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .name-btn-top-right:hover {
+      background-color: #45a049;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <button class="name-btn-top-right">{{ email }}</button>
+    <div class="card">
+      <h1>🌾 Allergy Tracker</h1>
+      <form method="POST">
+        <label for="allergic">Are you allergic to pollen?</label>
+        <select name="allergic" id="allergic">
+          <option value="1" {% if allergic %}selected{% endif %}>Yes</option>
+          <option value="0" {% if not allergic %}selected{% endif %}>No</option>
+        </select>
+        <button id="submit" type="submit">Update Status</button>
+      </form>
+      
+      <div class="status {% if allergic and in_allergic_area %}alert{% elif allergic %}safe{% endif %}">
+        {% if allergic %}
+        {% if in_allergic_area %}
+        ⚠️ You are currently in a high pollen area! We've sent you an alert.
+        {% else %}
+        ✅ You're allergic, but you're currently in a safe zone.
+        {% endif %}
+        {% else %}
+        🙌 You're not allergic to pollen. No action needed.
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      let lastUpdateTime = 0;
+      const updateInterval = 10000; // 10 seconds in milliseconds
+
+      function throttledUpdate(position) {
+        const now = Date.now();
+        if (now - lastUpdateTime < updateInterval) return;
+
+        lastUpdateTime = now;
+
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+
+        console.log("📍 Sending location:", lat, lon);
+
+        // Step 1: Send location to backend
+        fetch("/save_location", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            latitude: lat,
+            longitude: lon
+          })
+        })
+          .then(() => {
+            // Step 2: Fetch updated dashboard fragment
+            return fetch("/dashboard");
+          })
+          .then(res => res.text())
+          .then(html => {
+            // document.getElementById("dashboard-status").innerHTML = html;
+            console.log("✅ Dashboard updated");
+          })
+          .catch(err => console.error("❌ Error updating dashboard:", err));
+      }
+
+      if ("geolocation" in navigator) {
+        navigator.geolocation.watchPosition(
+          throttledUpdate,
+          err => console.error("❌ Location error:", err),
+          {
+            enableHighAccuracy: true,
+            maximumAge: 0,
+            timeout: 30000
+          }
+        );
+      } else {
+        alert("Geolocation is not supported by your browser.");
+      }
+    });
+  </script>
+
+
+</body>
+
+</html>

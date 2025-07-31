@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+  <link rel="icon" href="{{ url_for('static', filename='icon.png') }}" type="image/png">
+  <title>Pollen Allergy Awareness</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to bottom, #e0f7fa, #ffffff);
+      color: #333;
+      scroll-behavior: smooth;
+    }
+
+    header {
+      background: #00838f;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+
+    header img {
+      height: 40px;
+      margin-right: 10px;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+    }
+
+    nav {
+      display: flex;
+    }
+
+    nav a {
+      color: white;
+      margin-left: 1rem;
+      text-decoration: none;
+      font-weight: 500;
+      transition: 0.3s;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    .hamburger {
+      display: none;
+      font-size: 1.8rem;
+      cursor: pointer;
+      color: white;
+    }
+
+    @media (max-width: 768px) {
+      nav {
+        position: absolute;
+        top: 70px;
+        right: 0;
+        background: #00838f;
+        flex-direction: column;
+        width: 100%;
+        display: none;
+        padding: 1rem;
+        z-index: 1000;
+      }
+
+      nav a {
+        display: block;
+        margin: 0.5rem 0;
+      }
+
+      nav.show {
+        display: flex;
+      }
+
+      .hamburger {
+        display: block;
+      }
+    }
+
+    section {
+      padding: 3rem 2rem;
+      max-width: 1000px;
+      margin: auto;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    .hero {
+      text-align: center;
+      background: #b2ebf2;
+      border-radius: 10px;
+      margin-top: 1rem;
+    }
+
+    .hero h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+    }
+
+    .info h2 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      color: #00796b;
+    }
+
+    .info ul,
+    .info ol {
+      margin: 1rem 0;
+      padding-left: 1.5rem;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      animation: fadeInUp 0.8s ease;
+      display: none;
+    }
+
+    .container.active {
+      display: block;
+    }
+
+    .container h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.8rem;
+      margin: 0.5rem 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.8rem;
+      background: #00838f;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #006064;
+    }
+
+    .toggle-link {
+      text-align: center;
+      margin-top: 1rem;
+      color: #00838f;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .pollen-box {
+      margin-top: 2rem;
+      background: #e0f2f1;
+      padding: 1.5rem;
+      border-left: 6px solid #00acc1;
+      border-radius: 8px;
+    }
+
+    footer {
+      background: #00838f;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+      margin-top: 2rem;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo-container">
+      <img src="{{ url_for('static', filename='icon.png') }}" alt="Logo">
+      <h2>Pollen Allergy</h2>
+    </div>
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+    <nav id="navLinks">
+      <a href="#about">About</a>
+      <a href="#symptoms">Symptoms</a>
+      <a href="#prevention">Prevention</a>
+      <a href="#pollen">Pollen</a>
+      <a href="/login">Login</a>
+      <a href="/register">Sign Up</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>Protect Yourself From Pollen Allergy</h1>
+    <p>Stay informed, check pollen levels, and breathe easier every season.</p>
+  </section>
+
+  <section class="info" id="about">
+    <h2>📌 What is Pollen Allergy?</h2>
+    <p>Pollen allergy, also known as hay fever or seasonal allergic rhinitis, is a common condition triggered when
+      the immune system overreacts to pollen from trees, grasses, or weeds. During certain times of the
+      year—typically spring, summer, and fall—plants release tiny grains of pollen into the air to fertilize other
+      plants. For many people, this natural process causes no issues, but for others, pollen becomes a powerful
+      allergen, causing a range of uncomfortable symptoms.
+
+      Pollen allergies are not contagious and can affect people of all ages. They are especially common in
+      children, teenagers, and young adults. The severity of symptoms can vary based on the type of pollen,
+      exposure levels, time of year, and individual sensitivity.</p>
+  </section>
+
+  <section class="info" id="symptoms">
+    <h2>🤧 Common Symptoms</h2>
+    <p>Pollen allergy symptoms may be mild or severe and can significantly impact daily life. Common symptoms
+      include:
+
+      Frequent sneezing
+
+      Nasal congestion or runny nose
+
+      Itchy, watery, or red eyes (allergic conjunctivitis)
+
+      Itchy throat or ears
+
+      Coughing
+
+      Sinus pressure and facial pain
+
+      Fatigue or trouble sleeping
+
+      Asthma attacks in sensitive individuals
+
+      These symptoms can interfere with sleep, concentration, school performance, and work productivity. In some
+      cases, people with pollen allergies may also experience worsening asthma symptoms.</p>
+    <ul>
+      <li>Runny or stuffy nose</li>
+      <li>Itchy or watery eyes</li>
+      <li>Frequent sneezing</li>
+      <li>Fatigue and difficulty sleeping</li>
+    </ul>
+  </section>
+
+  <section class="info" id="about">
+    <h2>🌾 Types of Pollen That Cause Allergies</h2>
+    <p>Tree Pollen – Released in late winter and early spring. Common trees include oak, birch, maple, cedar, and
+      pine.
+
+      Grass Pollen – Most active in late spring and early summer. Common grasses include Bermuda, Kentucky
+      bluegrass, and Timothy grass.
+
+      Weed Pollen – Appears in late summer and fall. Common culprits include ragweed, sagebrush, and pigweed.
+
+      Each type of pollen has a different season and geographic prevalence. Checking local pollen forecasts can
+      help allergy sufferers prepare.</p>
+  </section>
+
+  <section class="info" id="prevention">
+    <h2>💡 Prevention Tips</h2>
+    <ol>
+      <li>Check local pollen forecasts daily.</li>
+      <li>Keep windows and doors shut during high pollen days.</li>
+      <li>Shower after being outdoors.</li>
+      <li>Use HEPA filters in your home and car.</li>
+    </ol>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 Pollen Tracker | All rights reserved.</p>
+  </footer>
+
+  <!-- ✅ Hamburger Toggle Script -->
+  <script>
+    function toggleMenu() {
+      const nav = document.getElementById("navLinks");
+      nav.classList.toggle("show");
+    }
+  </script>
+
+  <!-- ✅ Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('{{ url_for("static", filename="service-worker.js") }}')
+          .then(function (reg) {
+            console.log('✅ Service Worker registered:', reg);
+          }).catch(function (error) {
+            console.error('❌ Service Worker registration failed:', error);
+          });
+      });
+    }
+  </script>
+
+</body>
+
+</html>
